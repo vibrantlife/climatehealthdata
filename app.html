@@ -12,7 +12,7 @@
 <body>
 <div id='map'></div>
 
-<script src='js/filteredcounties.geojson'></script>
+<script src='js/filteredCAdata.geojson'></script>
 
 <script>
 L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4OGJmOTgxOWYyZDcxZTAxNjkxZSJ9.6cTAeegtjLZT_T9JKJJECg';
@@ -26,11 +26,10 @@ L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4O
   var statesLayer = L.geoJson(countiesData,
   {  style: getStyle,
       onEachFeature: onEachFeature,
+
   }).addTo(map);
 
-  // function markerSize(d){
-  //   return d >
-  // }
+
 
   function getStyle(feature) {
       return {
@@ -38,23 +37,40 @@ L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4O
           opacity: 0.1,
           color: 'black',
           fillOpacity: 0.7,
-          fillColor: getColor(feature.properties.CENSUSAREA)
+          fillColor: getColor(parseInt(feature.properties['Median Household Income']))
           // marker: markerSize(feature.properties.air)
       };
   }
 
   // get color depending on population density value
   function getColor(d) {
-      return d > 5000 ? '#004C1A' :
-          d > 4000  ? '#007A29' :
-          d > 3000  ? '#19A347' :
-          d > 2000  ? '#4DB870' :
-          d > 1000   ? '#80CC99' :
-          d > 0   ? '#B2E0C2' :
+    // debugger;
+      return d > 100 ? '#004C1A' :
+          d > 80  ? '#007A29' :
+          d > 60  ? '#19A347' :
+          d > 40  ? '#4DB870' :
+          d > 20  ? '#B2E0C2' :
           '#CCF5CC';
   }
 
+  function getIconStyle(d,label) {
+      return d > 40 ? {'marker-size':'large','marker-color':'#004C1A','marker-title':label} :
+          d > 30  ? {'marker-size':'large','marker-color':'#004C1A','marker-title':label} :
+          d > 20  ? {'marker-size':'medium','marker-color':'#004C1A','marker-title':"cheese"} :
+          d > 10  ? {'marker-size':'medium','marker-color':'#004C1A','marker-title':label} :
+          d > 0  ? {'marker-size':'small','marker-color':'#004C1A','marker-title':label} :
+          {'marker-size':'large','marker-color':'#004C1A','marker-title':label};
+  }
+
   function onEachFeature(feature, layer) {
+      var bounds = layer.getBounds();
+
+      var center = bounds.getCenter();
+
+      var airQuality = feature.properties['PM2.5 Weighted Mean 24-hr'];
+
+      L.marker(center,{'icon':L.mapbox.marker.icon(getIconStyle(airQuality,airQuality))}).addTo(map);
+
       layer.on({
           mousemove: mousemove,
           mouseout: mouseout,
@@ -68,8 +84,8 @@ L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4O
       var layer = e.target;
 
       popup.setLatLng(e.latlng);
-      popup.setContent('<div class="marker-title income air">' + layer.feature.properties.NAME + '</div>' +
-          layer.feature.properties.CENSUSAREA + ' Median Household Income');
+      popup.setContent('<div class="marker-title">' + layer.feature.properties.NAME + '</div>' +
+          layer.feature.properties['Median Household Income'] + ' Median Household Income' + '<div>PM2.5 Weighted Mean 24-hr: ' + layer.feature.properties['PM2.5 Weighted Mean 24-hr']+'</div>');
 
       if (!popup._map) popup.openOn(map);
       window.clearTimeout(closeTooltip);
@@ -100,7 +116,7 @@ L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4O
   map.legendControl.addLegend(getLegendHTML());
 
   function getLegendHTML() {
-    var grades = [0,1000, 2000, 3000, 4000, 5000],
+    var grades = [20, 40, 60, 80,100],
     labels = [],
     from, to;
 
