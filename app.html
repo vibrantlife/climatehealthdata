@@ -7,16 +7,12 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
-<style>
-  body { margin:0; padding:0; }
-  #map { position:absolute; top:0; bottom:0; width:100%; }
-</style>
 </head>
 </head>
 <body>
 <div id='map'></div>
 
-<script src='js/counties.geojson'></script>
+<script src='js/ca.geojson'></script>
 
 <script>
 L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4OGJmOTgxOWYyZDcxZTAxNjkxZSJ9.6cTAeegtjLZT_T9JKJJECg';
@@ -37,7 +33,7 @@ L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4O
           opacity: 0.1,
           color: 'black',
           fillOpacity: 0.7,
-          fillColor: getColor(feature.properties.density)
+          fillColor: getColor(feature.properties.CENSUSAREA)
       };
   }
 
@@ -68,7 +64,7 @@ L.mapbox.accessToken = 'pk.eyJ1IjoidGhvbWFzbGVlMTkxMSIsImEiOiJlZDVkZDUxNGFiOTA4O
 
       popup.setLatLng(e.latlng);
       popup.setContent('<div class="marker-title">' + layer.feature.properties.name + '</div>' +
-          layer.feature.properties.density + ' people per square mile');
+          layer.feature.properties.CENSUSAREA + ' people per square mile');
 
       if (!popup._map) popup.openOn(map);
       window.clearTimeout(closeTooltip);
